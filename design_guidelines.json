@@ -1,0 +1,123 @@
+{
+  "theme": "dark",
+  "archetype": "Archetype 7: Electric & Neon (Hybrid with Ubuntu/Linux SOC Theme)",
+  "design_philosophy": {
+    "identity": "E1 - The Anti-AI Designer",
+    "core_principles": [
+      "Authoritative Precision: The interface must feel like a mission-critical Security Operations Center (SOC) console, not a generic SaaS product.",
+      "Ubuntu Cybernetic Aesthetic: Deep aubergine-tinted dark backgrounds contrasted with harsh electric neon accents (Red for Threats, Cyan/Blue for Safe/System).",
+      "Terminal-Inspired Density: Utilize 'Control Room' grid mechanics. Every pixel is functional. Data is dense, borders are sharp (1px), and typography is highly legible."
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "headings": "Chivo",
+      "body": "IBM Plex Sans",
+      "mono": "JetBrains Mono"
+    },
+    "scales": {
+      "h1": "text-4xl sm:text-5xl font-black tracking-tighter",
+      "h2": "text-2xl sm:text-3xl font-bold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-bold tracking-tight",
+      "h4": "text-lg font-semibold tracking-tight uppercase",
+      "body": "text-sm sm:text-base leading-relaxed",
+      "data_metric": "text-4xl sm:text-5xl font-mono tracking-tighter font-medium",
+      "terminal": "text-xs sm:text-sm font-mono tracking-tight"
+    },
+    "rules": {
+      "overlines": "text-xs uppercase tracking-[0.2em] font-bold text-accent-blue/80",
+      "numbers": "All KPIs, metric counts, and IP addresses MUST use the mono font (JetBrains Mono)."
+    }
+  },
+  "colors": {
+    "backgrounds": {
+      "app": "#0D0A10",
+      "surface_card": "#16131D",
+      "surface_terminal": "#050408",
+      "overlay": "rgba(13, 10, 16, 0.8)"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A29DB0",
+      "muted": "#6A6578"
+    },
+    "borders": {
+      "default": "#2A2536",
+      "active": "#453D55"
+    },
+    "accents": {
+      "threat_red": "#FF3B30",
+      "threat_red_glow": "rgba(255, 59, 48, 0.2)",
+      "safe_blue": "#00D4FF",
+      "safe_blue_glow": "rgba(0, 212, 255, 0.2)",
+      "ubuntu_orange": "#E95420",
+      "warning_amber": "#FF9F0A"
+    },
+    "charts": {
+      "allowed": "#00D4FF",
+      "blocked": "#FF3B30",
+      "rate_limit": "#FF9F0A",
+      "sql_injection": "#E95420",
+      "xss": "#BF5AF2",
+      "traversal": "#FF3B30",
+      "grid_lines": "#2A2536"
+    }
+  },
+  "spacing_and_layout": {
+    "mode": "MODE B: THE CONTROL ROOM GRID",
+    "container": "w-full max-w-[1600px] mx-auto p-4 md:p-6",
+    "grid_system": {
+      "base": "grid grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-4 md:gap-6",
+      "spans": {
+        "kpi_card": "col-span-1 md:col-span-2 lg:col-span-3",
+        "main_chart": "col-span-1 md:col-span-4 lg:col-span-8 row-span-2",
+        "side_panel": "col-span-1 md:col-span-4 lg:col-span-4 row-span-2"
+      }
+    },
+    "padding_rules": "Card internals should use p-5 or p-6. Terminal windows should use tight padding (p-4)."
+  },
+  "surfaces_and_micro_themes": {
+    "cards": "Flat background (surface_card), 1px solid border (border-default), rounded-none or max rounded-md. NO soft shadows. Use 'Grid Borders' tech look.",
+    "threat_cards": "Same as default cards, but with border-t-2 or border-l-2 using threat_red.",
+    "terminal_panels": "Deepest black (surface_terminal), border border-active, font-mono. Use for Live Attack Simulator and Logs.",
+    "buttons": {
+      "primary": "bg-accent-safe_blue text-black font-bold uppercase tracking-wide hover:bg-white transition-colors rounded-sm px-6 py-2",
+      "destructive": "bg-accent-threat_red/10 border border-accent-threat_red text-accent-threat_red hover:bg-accent-threat_red hover:text-white transition-colors rounded-sm px-4 py-2"
+    },
+    "inputs": "bg-surface_terminal border border-borders-default focus:border-accent-safe_blue text-text-primary placeholder:text-text-muted rounded-sm px-3 py-2"
+  },
+  "components": {
+    "charts": "Use Recharts. Crucial: Set chart grid lines to subtle stroke (#2A2536). Remove axis lines, keep tick labels in font-mono text-xs.",
+    "tables": "Dense. Use Shadcn Table. hover:bg-white/5 for rows. Threat rows must feature a left-accent border in red. IP addresses in font-mono.",
+    "login_screen": "Split view. Left: Sharp, brutalist login form using terminal motifs. Right: Full bleed neon data background image with a dark overlay (bg-black/60).",
+    "attack_simulator": "Render as a faux command-line interface. Action buttons (Fire SQLi, XSS) should look like terminal scripts. Output area should auto-scroll like live logs.",
+    "file_upload": "Dashed border (border-dashed border-borders-active). On drag over, border turns safe_blue with a slight safe_blue_glow background."
+  },
+  "animations": {
+    "charts": "Framer Motion layout animations for data changes. Subtle pulse on live active threats.",
+    "alerts": "New threats entering the table should flash bg-accent-threat_red/20 before settling.",
+    "hover_states": "-translate-y-[1px] with a subtle colored drop-shadow (e.g., shadow-[0_4px_20px_rgba(0,212,255,0.1)]) on interactive cards."
+  },
+  "media_urls": {
+    "login_background": {
+      "url": "https://images.unsplash.com/photo-1762279389006-43963a0cee55?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwxfHxmdXR1cmlzdGljJTIwbmVvbiUyMHJlZCUyMGJsdWUlMjBkYXRhfGVufDB8fHx8MTc3ODQ5MDE1OHww&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract neon red and blue lines representing network data flows. To be used as the right-side cover image on the Admin Login page.",
+      "usage": "Login page background/split-screen cover."
+    },
+    "shield_icon": {
+      "url": "https://images.unsplash.com/photo-1639322537228-f710d846310a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzB8MHwxfHNlYXJjaHwyfHxjeWJlcnNlY3VyaXR5JTIwbmV0d29yayUyMG5vZGVzJTIwZGFya3xlbnwwfHx8fDE3Nzg0OTAxNTh8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Cybersecurity cubes abstract background. Can be used for header branding or simulator panel backgrounds at 10% opacity.",
+      "usage": "Subtle textured background for the Live Attack Simulator or Rules page."
+    }
+  },
+  "testing": {
+    "attributes": "All interactive elements, forms, and major metric displays MUST include data-testid. Examples: data-testid='login-submit-button', data-testid='metric-blocked-requests', data-testid='sim-sqli-btn'."
+  },
+  "instructions_to_main_agent": [
+    "1. Setup Tailwind config explicitly mapping the colors defined here. E.g., background-app -> bg-background, text-primary -> text-foreground.",
+    "2. For Shadcn UI components, override the default border radii to be extremely small (0px to 4px max) to maintain the technical, sharp 'Terminal' look.",
+    "3. Dashboard Grid: Use CSS Grid explicitly. Do not rely solely on Flexbox for the main dashboard skeleton.",
+    "4. Navigation should be a vertical sidebar or a dense top-bar with a heavy, solid background (not transparent) to anchor the UI.",
+    "5. Font loading: Ensure Chivo, IBM Plex Sans, and JetBrains Mono are loaded via Google Fonts or standard imports."
+  ]
+}

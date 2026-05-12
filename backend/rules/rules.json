@@ -1,0 +1,22 @@
+[
+  {"rule_id": "SQLI_001", "category": "SQL Injection",     "pattern": "(?i)\\bor\\s+1\\s*=\\s*1\\b",            "severity": "high",     "score": 10, "description": "Boolean-based SQL injection (OR 1=1)"},
+  {"rule_id": "SQLI_002", "category": "SQL Injection",     "pattern": "(?i)\\bunion\\s+select\\b",                "severity": "high",     "score": 10, "description": "UNION-based SQL injection"},
+  {"rule_id": "SQLI_003", "category": "SQL Injection",     "pattern": "(?i)\\bdrop\\s+table\\b",                  "severity": "critical", "score": 20, "description": "Destructive SQL: DROP TABLE"},
+  {"rule_id": "SQLI_004", "category": "SQL Injection",     "pattern": "(?i)';\\s*--",                             "severity": "medium",   "score": 5,  "description": "SQL comment injection terminator"},
+  {"rule_id": "SQLI_005", "category": "SQL Injection",     "pattern": "(?i)\\bselect\\b.+\\bfrom\\b.+\\binformation_schema\\b", "severity": "high", "score": 10, "description": "information_schema enumeration"},
+  {"rule_id": "SQLI_006", "category": "SQL Injection",     "pattern": "(?i)\\bsleep\\s*\\(\\s*\\d+\\s*\\)",       "severity": "high",     "score": 10, "description": "Time-based SQL injection (SLEEP)"},
+  {"rule_id": "XSS_001",  "category": "Cross-Site Scripting", "pattern": "(?i)<\\s*script[\\s>]",                "severity": "high",     "score": 10, "description": "Inline <script> tag"},
+  {"rule_id": "XSS_002",  "category": "Cross-Site Scripting", "pattern": "(?i)javascript\\s*:",                  "severity": "high",     "score": 10, "description": "javascript: URI scheme"},
+  {"rule_id": "XSS_003",  "category": "Cross-Site Scripting", "pattern": "(?i)on(error|load|click|mouseover)\\s*=", "severity": "medium","score": 5,  "description": "Inline event handler"},
+  {"rule_id": "XSS_004",  "category": "Cross-Site Scripting", "pattern": "(?i)<\\s*iframe",                      "severity": "medium",   "score": 5,  "description": "Embedded iframe"},
+  {"rule_id": "XSS_005",  "category": "Cross-Site Scripting", "pattern": "(?i)document\\.cookie",                "severity": "high",     "score": 10, "description": "Cookie exfiltration attempt"},
+  {"rule_id": "TRV_001",  "category": "Directory Traversal", "pattern": "\\.\\./",                               "severity": "high",     "score": 10, "description": "Path traversal (../)"},
+  {"rule_id": "TRV_002",  "category": "Directory Traversal", "pattern": "(?i)/etc/passwd",                       "severity": "critical", "score": 20, "description": "Linux sensitive file access"},
+  {"rule_id": "TRV_003",  "category": "Directory Traversal", "pattern": "(?i)\\\\windows\\\\system32",           "severity": "critical", "score": 20, "description": "Windows system path access"},
+  {"rule_id": "CMD_001",  "category": "Command Injection",   "pattern": "(?i);\\s*(ls|cat|whoami|id|uname|nc|bash|sh)\\b", "severity": "critical", "score": 20, "description": "Shell command chaining"},
+  {"rule_id": "CMD_002",  "category": "Command Injection",   "pattern": "&&\\s*(ls|cat|whoami|rm|curl|wget)\\b", "severity": "critical", "score": 20, "description": "AND-chained command injection"},
+  {"rule_id": "CMD_003",  "category": "Command Injection",   "pattern": "\\|\\s*(nc|bash|sh|curl|wget)\\b",      "severity": "high",     "score": 10, "description": "Pipe-based command injection"},
+  {"rule_id": "CMD_004",  "category": "Command Injection",   "pattern": "(?i)`[^`]*`",                           "severity": "medium",   "score": 5,  "description": "Backtick command substitution"},
+  {"rule_id": "LFI_001",  "category": "Local File Inclusion","pattern": "(?i)php://(filter|input)",              "severity": "high",     "score": 10, "description": "PHP wrapper file inclusion"},
+  {"rule_id": "RCE_001",  "category": "Remote Code Execution","pattern": "(?i)(eval|exec|system)\\s*\\(",        "severity": "critical", "score": 20, "description": "Function eval/exec/system call"}
+]
