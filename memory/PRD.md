@@ -26,7 +26,14 @@ Full-stack cybersecurity project: WAF + IDS hybrid with HTTP request inspection,
 
 ## Backlog / Next
 - P1: WebSocket live event push for dashboard
-- P1: GeoIP enrichment + world heatmap
-- P2: Custom rule editor UI
-- P2: Slack/email webhook alerts
-- P2: Persistent ML model with online learning
+- P2: GeoIP enrichment + world heatmap
+- P3: Custom rule editor UI
+- P4: Slack/email webhook alerts
+- P5: Persistent ML model with online learning
+- P6: Browser fingerprinting
+- P7: CAPTCHA integration
+- P8: JavaScript challenge-response
+- P9: Advanced behavioral analytics
+- P10: Cloudflare-style bot scoring
+- P11: OS-Level firewall automation and packet inspection
+- P12: AI bot detection

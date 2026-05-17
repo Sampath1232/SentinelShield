@@ -1,5 +1,6 @@
 """SentinelShield - FastAPI server (WAF + IDS + Dashboard API)."""
 from dotenv import load_dotenv
+load_dotenv()
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent
@@ -143,13 +144,14 @@ async def update_ip_reputation(ip: str, delta: int, last_action: str, last_categ
 
 
 async def record_event(ip: str, method: str, path: str, query: str,
-                       headers: dict, body: str, source: str = "live"):
+                       headers: dict, body: str, source: str = "live", fingerprint: str = "unknown"):
     # Rate-limit pre-check
     allowed, reason = limiter.check(ip)
     if not allowed:
         ev = write_event({
             "ip": ip, "method": method, "path": path, "query": query,
             "user_agent": headers.get("user-agent", ""),
+            "device_fingerprint": fingerprint,
             "category": "Rate Limit", "rule_id": "RL_001",
             "severity": "medium", "score": 5, "action": "blocked",
             "reason": reason, "source": source,
@@ -181,6 +183,7 @@ async def record_event(ip: str, method: str, path: str, query: str,
     ev = write_event({
         "ip": ip, "method": method, "path": path, "query": query,
         "user_agent": headers.get("user-agent", ""),
+        "device_fingerprint": fingerprint,
         "category": category, "rule_id": rule_id,
         "severity": result["severity"] if result["matches"] else "none",
         "score": result["score"], "action": action,
@@ -204,8 +207,9 @@ class InspectIn(BaseModel):
 @api.post("/inspect")
 async def inspect(payload: InspectIn, request: Request):
     ip = client_ip(request)
+    fingerprint = request.headers.get("X-Device-Fingerprint", "unknown")
     headers = {"user-agent": payload.user_agent or request.headers.get("user-agent", "")}
-    res = await record_event(ip, payload.method, payload.path, payload.query, headers, payload.body, source="api")
+    res = await record_event(ip, payload.method, payload.path, payload.query, headers, payload.body, source="api", fingerprint=fingerprint)
     if res.get("blocked"):
         return JSONResponse(status_code=403, content=res)
     return res
@@ -238,7 +242,7 @@ async def simulate(body: SimIn, request: Request, user: dict = Depends(get_curre
     # Reset limiter for clean isolated demo runs
     limiter.unblock(ip)
     headers = {"user-agent": f"SentinelShield-SimAgent/{body.type}"}
-    res = await record_event(ip, p["method"], p["path"], p["query"], headers, p["body"], source="simulator")
+    res = await record_event(ip, p["method"], p["path"], p["query"], headers, p["body"], source="simulator", fingerprint=request.headers.get("X-Device-Fingerprint", "unknown"))
     return {"simulated": body.type, "payload": p, "result": res}
 
 
@@ -251,7 +255,7 @@ async def simulate_burst(request: Request, user: dict = Depends(get_current_user
     results = []
     headers = {"user-agent": "SentinelShield-BurstAgent"}
     for i in range(15):
-        r = await record_event(spoof, "GET", "/api/v1/data", f"i={i}", headers, "", source="simulator")
+        r = await record_event(spoof, "GET", "/api/v1/data", f"i={i}", headers, "", source="simulator", fingerprint=request.headers.get("X-Device-Fingerprint", "unknown"))
         reason = r.get("reason") or ("rate_limited" if r.get("ip_status") == "temp_banned" and r.get("blocked") else None)
         results.append({"i": i, "blocked": r.get("blocked"), "reason": reason})
     return {"simulated": "burst", "spoof_ip": spoof, "results": results}
@@ -429,20 +433,20 @@ async def on_start():
                                   {"$set": {"password_hash": hash_password(admin_pwd)}})
 
     # seed events if empty
-    if await db.events.count_documents({}) == 0:
-        events = generate_events(200)
-        for e in events:
-            e["id"] = str(uuid.uuid4())
-            ip = e["ip"]
-            await db.ip_reputation.update_one(
-                {"ip": ip},
-                {"$set": {"ip": ip, "status": "ok",
-                          "last_action": e["action"], "last_category": e["category"],
-                          "updated_at": e["timestamp"]},
-                 "$inc": {"hits": 1, "score": e["score"] if e["action"] == "blocked" else 0}},
-                upsert=True,
-            )
-        await db.events.insert_many(events)
+   # if await db.events.count_documents({}) == 0:
+        #events = generate_events(200)
+       # for e in events:
+         #   e["id"] = str(uuid.uuid4())
+         #   ip = e["ip"]
+         #   await db.ip_reputation.update_one(
+              #  {"ip": ip},
+              #  {"$set": {"ip": ip, "status": "ok",
+                #          "last_action": e["action"], "last_category": e["category"],
+                #          "updated_at": e["timestamp"]},
+               #  "$inc": {"hits": 1, "score": e["score"] if e["action"] == "blocked" else 0}},
+              #  upsert=True,
+         #   )
+        #await db.events.insert_many(events)
 
 
 @app.on_event("shutdown")

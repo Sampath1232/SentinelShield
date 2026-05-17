@@ -55,7 +55,9 @@ export default function Logs() {
           <Sel name="action" options={["allowed", "blocked"]} testid="filter-action" />
           <Sel name="severity" options={["critical", "high", "medium", "low", "none"]} testid="filter-severity" />
           <Sel name="category" options={["SQL Injection", "Cross-Site Scripting", "Directory Traversal", "Command Injection", "Rate Limit", "Behavioral Anomaly", "Malicious Upload", "Benign"]} testid="filter-category" />
-          <div className="ml-auto text-xs font-mono text-sentinel-muted">{logs.length} events</div>
+          <div className="ml-auto text-xs font-mono text-sentinel-muted">
+                  Showing latest {logs.length} events
+              </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -71,6 +73,7 @@ export default function Logs() {
                 <th className="text-left">Severity</th>
                 <th className="text-left">Score</th>
                 <th className="text-left">Action</th>
+                <th className="text-left">Fingerprint</th>
               </tr>
             </thead>
             <tbody data-testid="logs-tbody">
@@ -85,6 +88,9 @@ export default function Logs() {
                   <td><SeverityPill severity={l.severity} /></td>
                   <td className="text-sentinel-amber">{l.score}</td>
                   <td><ActionPill action={l.action} /></td>
+                  <td className="text-sentinel-secondary">
+                    {l.device_fingerprint || "unknown"}
+                        </td>
                 </tr>
               ))}
               {logs.length === 0 && (

@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { generateFingerprint } from "./fingerprint";
 export const API_BASE = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export const api = axios.create({
@@ -10,7 +10,13 @@ export const api = axios.create({
 // Attach bearer token from localStorage as a fallback (in case cookies blocked)
 api.interceptors.request.use((cfg) => {
   const t = localStorage.getItem("ss_token");
-  if (t) cfg.headers.Authorization = `Bearer ${t}`;
+
+  if (t) {
+    cfg.headers.Authorization = `Bearer ${t}`;
+  }
+
+  cfg.headers["X-Device-Fingerprint"] = generateFingerprint();
+  console.log("Fingerprint:", cfg.headers["X-Device-Fingerprint"]);
   return cfg;
 });
 
