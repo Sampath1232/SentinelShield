@@ -5,8 +5,8 @@ import { ShieldAlert, Terminal, Lock } from "lucide-react";
 
 export default function Login() {
   const { user, login, error } = useAuth();
-  const [email, setEmail] = useState("admin@sentinelshield.io");
-  const [password, setPassword] = useState("Sentinel@2026");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
 
@@ -72,7 +72,7 @@ export default function Login() {
 
             <div className="text-xs text-sentinel-muted font-mono pt-2 border-t border-sentinel-border">
               <Terminal className="inline w-3 h-3 mr-1" />
-              demo: admin@sentinelshield.io / Sentinel@2026
+               Security monitoring portal • Authorized access only
             </div>
           </form>
         </div>

@@ -7,6 +7,7 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
 import os
+import time
 import io
 import re
 import uuid
@@ -35,11 +36,31 @@ db = client[os.environ["DB_NAME"]]
 
 JWT_SECRET = os.environ["JWT_SECRET"]
 JWT_ALG = "HS256"
+LOGIN_ATTEMPTS = {}  # ip -> [timestamps of attempts]
+RATE_LIMIT = {}  # max attempts
 
 # ----- App -----
-app = FastAPI(title="SentinelShield API")
-api = APIRouter(prefix="/api")
+app = FastAPI(docs_url=None, redoc_url=None,)
 
+@app.middleware("http")
+async def security_headers(request, call_next):
+    response = await call_next(request)
+
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin"
+
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "img-src 'self' https: data:; "
+        "style-src 'self' 'unsafe-inline' https:; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "font-src 'self' https: data:;"
+    )
+
+    return response
+
+api = APIRouter(prefix="/api")
 
 # =========================================================
 # AUTH
@@ -89,17 +110,51 @@ async def get_current_user(request: Request) -> dict:
 
 
 @api.post("/auth/login")
-async def login(body: LoginIn, response: Response):
-    email = body.email.lower()
-    user = await db.users.find_one({"email": email})
-    if not user or not verify_password(body.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    token = make_access_token(user["id"], user["email"])
-    response.set_cookie("access_token", token, httponly=True, secure=False,
-                        samesite="lax", max_age=8 * 3600, path="/")
-    return {"id": user["id"], "email": user["email"], "name": user.get("name", "Admin"),
-            "role": user.get("role", "admin"), "token": token}
+async def login(body: LoginIn, request: Request, response: Response):
 
+    ip = request.client.host
+
+    # simple in-memory login tracking
+    if ip not in LOGIN_ATTEMPTS:
+        LOGIN_ATTEMPTS[ip] = []
+
+    now = time.time()
+
+    # keep only last 60 seconds
+    LOGIN_ATTEMPTS[ip] = [
+        t for t in LOGIN_ATTEMPTS[ip]
+        if now - t < 60
+    ]
+
+    # block after 5 attempts
+    if len(LOGIN_ATTEMPTS[ip]) >= 5:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many login attempts"
+        )
+
+    user = await db.users.find_one({"email": body.email})
+
+    if not user or not verify_password(body.password, user["password_hash"]):
+        LOGIN_ATTEMPTS[ip].append(now)
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    # clear attempts on successful login
+    LOGIN_ATTEMPTS[ip] = []
+
+    token = make_access_token(user["id"], user["email"])
+
+    return {
+        "id": str(user["_id"]),
+        "email": user["email"],
+        "name": user["name"],
+        "role": user["role"],
+        "token": token
+    }
 
 @api.post("/auth/logout")
 async def logout(response: Response):
@@ -424,7 +479,7 @@ async def on_start():
             "id": str(uuid.uuid4()),
             "email": admin_email,
             "password_hash": hash_password(admin_pwd),
-            "name": "Admin",
+            "name": "SOC Administrator",
             "role": "admin",
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
@@ -433,19 +488,19 @@ async def on_start():
                                   {"$set": {"password_hash": hash_password(admin_pwd)}})
 
     # seed events if empty
-   # if await db.events.count_documents({}) == 0:
+    #if await db.events.count_documents({}) == 0:
         #events = generate_events(200)
-       # for e in events:
-         #   e["id"] = str(uuid.uuid4())
-         #   ip = e["ip"]
-         #   await db.ip_reputation.update_one(
-              #  {"ip": ip},
-              #  {"$set": {"ip": ip, "status": "ok",
-                #          "last_action": e["action"], "last_category": e["category"],
-                #          "updated_at": e["timestamp"]},
-               #  "$inc": {"hits": 1, "score": e["score"] if e["action"] == "blocked" else 0}},
-              #  upsert=True,
-         #   )
+        #for e in events:
+            #e["id"] = str(uuid.uuid4())
+            #ip = e["ip"]
+            #await db.ip_reputation.update_one(
+                #{"ip": ip},
+                #{"$set": {"ip": ip, "status": "ok",
+                        #"last_action": e["action"], "last_category": e["category"],
+                        #"updated_at": e["timestamp"]},
+                #"$inc": {"hits": 1, "score": e["score"] if e["action"] == "blocked" else 0}},
+                #upsert=True,
+            #)
         #await db.events.insert_many(events)
 
 
