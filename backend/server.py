@@ -488,20 +488,20 @@ async def on_start():
                                   {"$set": {"password_hash": hash_password(admin_pwd)}})
 
     # seed events if empty
-    #if await db.events.count_documents({}) == 0:
-        #events = generate_events(200)
-        #for e in events:
-            #e["id"] = str(uuid.uuid4())
-            #ip = e["ip"]
-            #await db.ip_reputation.update_one(
-                #{"ip": ip},
-                #{"$set": {"ip": ip, "status": "ok",
-                        #"last_action": e["action"], "last_category": e["category"],
-                        #"updated_at": e["timestamp"]},
-                #"$inc": {"hits": 1, "score": e["score"] if e["action"] == "blocked" else 0}},
-                #upsert=True,
-            #)
-        #await db.events.insert_many(events)
+    if await db.events.count_documents({}) == 0:
+        events = generate_events(200)
+        for e in events:
+            e["id"] = str(uuid.uuid4())
+            ip = e["ip"]
+            await db.ip_reputation.update_one(
+                {"ip": ip},
+                {"$set": {"ip": ip, "status": "ok",
+                        "last_action": e["action"], "last_category": e["category"],
+                        "updated_at": e["timestamp"]},
+                "$inc": {"hits": 1, "score": e["score"] if e["action"] == "blocked" else 0}},
+                upsert=True,
+            )
+        await db.events.insert_many(events)
 
 
 @app.on_event("shutdown")
