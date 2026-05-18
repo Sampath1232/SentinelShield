@@ -488,7 +488,7 @@ async def on_start():
                                   {"$set": {"password_hash": hash_password(admin_pwd)}})
 
     # seed events if empty
-    if await db.events.count_documents({}) == 0:
+    if await db.events.count_documents({}) <= 50:
         events = generate_events(200)
         for e in events:
             e["id"] = str(uuid.uuid4())
