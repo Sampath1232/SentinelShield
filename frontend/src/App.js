@@ -28,7 +28,14 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
+
           <Toaster theme="dark" position="top-right" />
+
+          <footer className="text-center text-gray-400 py-4 text-sm">
+            <p>Developed by Sampath G L</p>
+            <p>© 2026 SentinelShield. All Rights Reserved.</p>
+          </footer>
+
         </AuthProvider>
       </BrowserRouter>
     </div>
